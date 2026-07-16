@@ -37,14 +37,30 @@ export const profileSchema = z.object({
 });
 export type ProfileValues = z.infer<typeof profileSchema>;
 
+export const slugSchema = z
+  .string()
+  .trim()
+  .min(2)
+  .max(40)
+  .regex(/^[a-z0-9-]+$/, "Lowercase letters, numbers, and hyphens only");
+
 export const orgSchema = z.object({
   name: z.string().trim().min(2).max(60),
-  slug: z
-    .string()
-    .trim()
-    .min(2)
-    .max(40)
-    .regex(/^[a-z0-9-]+$/, "Lowercase letters, numbers, and hyphens only"),
+  slug: slugSchema,
   description: z.string().trim().max(280).optional().or(z.literal("")),
 });
 export type OrgValues = z.infer<typeof orgSchema>;
+
+export const orgSettingsSchema = z.object({
+  name: z.string().trim().min(2).max(60),
+  slug: slugSchema,
+  description: z.string().trim().max(280).optional().or(z.literal("")),
+  status: z.enum(["active", "suspended"]),
+});
+export type OrgSettingsValues = z.infer<typeof orgSettingsSchema>;
+
+export const inviteSchema = z.object({
+  email: emailSchema,
+  role: z.enum(["admin", "member"]),
+});
+export type InviteValues = z.infer<typeof inviteSchema>;
