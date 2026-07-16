@@ -58,6 +58,118 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          last_used_at: string | null
+          last_used_ip: string | null
+          name: string
+          organization_id: string
+          prefix: string
+          revoked_at: string | null
+          scopes: string[]
+          token_hash: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          last_used_ip?: string | null
+          name: string
+          organization_id: string
+          prefix: string
+          revoked_at?: string | null
+          scopes?: string[]
+          token_hash: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          last_used_ip?: string | null
+          name?: string
+          organization_id?: string
+          prefix?: string
+          revoked_at?: string | null
+          scopes?: string[]
+          token_hash?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          category: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip: string | null
+          metadata: Json
+          organization_id: string | null
+          summary: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          category: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          organization_id?: string | null
+          summary: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          category?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          organization_id?: string | null
+          summary?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           created_at: string
@@ -92,6 +204,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "departments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          enabled: boolean
+          id: string
+          key: string
+          metadata: Json
+          name: string
+          organization_id: string | null
+          rollout_percentage: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key: string
+          metadata?: Json
+          name: string
+          organization_id?: string | null
+          rollout_percentage?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key?: string
+          metadata?: Json
+          name?: string
+          organization_id?: string | null
+          rollout_percentage?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_flags_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -527,9 +689,45 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_get_stats: { Args: never; Returns: Json }
+      admin_list_organizations: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          member_count: number
+          name: string
+          slug: string
+          status: Database["public"]["Enums"]["org_status"]
+        }[]
+      }
+      admin_list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          last_sign_in_at: string
+          org_count: number
+        }[]
+      }
       can_manage_team: {
         Args: { _team: string; _user: string }
         Returns: boolean
+      }
+      create_api_key: {
+        Args: {
+          _expires_at?: string
+          _name: string
+          _org: string
+          _scopes?: string[]
+        }
+        Returns: {
+          id: string
+          prefix: string
+          token: string
+        }[]
       }
       create_organization: {
         Args: { _description?: string; _name: string; _slug: string }
@@ -600,6 +798,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      regenerate_api_key: {
+        Args: { _id: string }
+        Returns: {
+          id: string
+          prefix: string
+          token: string
+        }[]
+      }
       reject_invitation: { Args: { _token: string }; Returns: undefined }
       resend_invitation: {
         Args: { _invitation_id: string }
@@ -623,7 +829,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revoke_api_key: { Args: { _id: string }; Returns: undefined }
       team_org: { Args: { _team: string }; Returns: string }
+      write_audit_log: {
+        Args: {
+          _action: string
+          _category: string
+          _entity_id?: string
+          _entity_type?: string
+          _metadata?: Json
+          _org: string
+          _summary: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       org_role: "owner" | "admin" | "member"

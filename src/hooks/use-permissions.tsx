@@ -24,6 +24,8 @@ export type PermissionKey =
   | "department.delete"
   | "invitation.view"
   | "invitation.manage"
+  | "audit.view"
+  | "feature_flag.manage"
   | "platform.admin";
 
 export function usePermissions() {
