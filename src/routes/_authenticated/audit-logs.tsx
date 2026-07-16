@@ -206,6 +206,22 @@ function AuditLogsPage() {
               </SelectContent>
             </Select>
           </div>
+          {actorFilter && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground">Filtered by actor:</span>
+              <Badge variant="secondary" className="gap-2">
+                {actors[actorFilter]?.full_name ?? actorFilter}
+                <button
+                  type="button"
+                  onClick={() => setActorFilter(null)}
+                  className="hover:text-destructive"
+                  aria-label="Clear actor filter"
+                >
+                  ×
+                </button>
+              </Badge>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           {isLoading ? (
