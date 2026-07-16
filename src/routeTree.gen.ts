@@ -17,6 +17,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedRolesRouteImport } from './routes/_authenticated/roles'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOrganizationsRouteImport } from './routes/_authenticated/organizations'
 import { Route as AuthenticatedInvitationsRouteImport } from './routes/_authenticated/invitations'
@@ -64,6 +65,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRolesRoute = AuthenticatedRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/organizations': typeof AuthenticatedOrganizationsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/roles': typeof AuthenticatedRolesRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/invitations': typeof AuthenticatedInvitationsRoute
   '/organizations': typeof AuthenticatedOrganizationsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/roles': typeof AuthenticatedRolesRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/invitations': typeof AuthenticatedInvitationsRoute
   '/_authenticated/organizations': typeof AuthenticatedOrganizationsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/roles': typeof AuthenticatedRolesRoute
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/invitations'
     | '/organizations'
     | '/profile'
+    | '/roles'
     | '/teams'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/invitations'
     | '/organizations'
     | '/profile'
+    | '/roles'
     | '/teams'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/invitations'
     | '/_authenticated/organizations'
     | '/_authenticated/profile'
+    | '/_authenticated/roles'
     | '/_authenticated/teams'
     | '/auth/callback'
     | '/auth/forgot-password'
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/teams'
       fullPath: '/teams'
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/roles': {
+      id: '/_authenticated/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof AuthenticatedRolesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -414,6 +433,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInvitationsRoute: typeof AuthenticatedInvitationsRoute
   AuthenticatedOrganizationsRoute: typeof AuthenticatedOrganizationsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedRolesRoute: typeof AuthenticatedRolesRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
 }
 
@@ -423,6 +443,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInvitationsRoute: AuthenticatedInvitationsRoute,
   AuthenticatedOrganizationsRoute: AuthenticatedOrganizationsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedRolesRoute: AuthenticatedRolesRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
 }
 
