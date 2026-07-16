@@ -246,7 +246,18 @@ function AuditLogsPage() {
                           <div className="text-[11px] font-mono text-muted-foreground">{log.action}</div>
                         </TableCell>
                         <TableCell className="text-sm">
-                          {actor?.full_name ?? (log.actor_id ? "Unknown user" : "System")}
+                          {log.actor_id ? (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setActorFilter(log.actor_id); }}
+                              className="text-left hover:underline text-primary"
+                              title="Filter events by this actor"
+                            >
+                              {actor?.full_name ?? "Unknown user"}
+                            </button>
+                          ) : (
+                            <span className="text-muted-foreground">System</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {log.entity_type ? (
