@@ -82,12 +82,13 @@ function AuditLogsPage() {
   const [category, setCategory] = useState<string>("all");
   const [range, setRange] = useState<string>("7d");
   const [query, setQuery] = useState("");
+  const [actorFilter, setActorFilter] = useState<string | null>(null);
   const [selected, setSelected] = useState<Log | null>(null);
   const qc = useQueryClient();
 
   const { data: logs = [], isLoading } = useQuery({
     enabled: !!currentOrgId && canView,
-    queryKey: ["audit-logs", currentOrgId, category, range],
+    queryKey: ["audit-logs", currentOrgId, category, range, actorFilter],
     queryFn: async () => {
       const cfg = RANGES.find((r) => r.key === range);
       let q = supabase
@@ -97,6 +98,7 @@ function AuditLogsPage() {
         .order("created_at", { ascending: false })
         .limit(500);
       if (category !== "all") q = q.eq("category", category);
+      if (actorFilter) q = q.eq("actor_id", actorFilter);
       if (cfg?.hours) {
         const since = new Date(Date.now() - cfg.hours * 3600_000).toISOString();
         q = q.gte("created_at", since);
