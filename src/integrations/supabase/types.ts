@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      organization_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          role: Database["public"]["Enums"]["org_role"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          role?: Database["public"]["Enums"]["org_role"]
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string
@@ -58,6 +105,7 @@ export type Database = {
           logo_url: string | null
           name: string
           slug: string
+          status: Database["public"]["Enums"]["org_status"]
           updated_at: string
         }
         Insert: {
@@ -68,6 +116,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           slug: string
+          status?: Database["public"]["Enums"]["org_status"]
           updated_at?: string
         }
         Update: {
@@ -78,6 +127,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           slug?: string
+          status?: Database["public"]["Enums"]["org_status"]
           updated_at?: string
         }
         Relationships: []
@@ -111,6 +161,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invitation: {
+        Args: { _token: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          slug: string
+          status: Database["public"]["Enums"]["org_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organizations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_organization: {
         Args: { _description?: string; _name: string; _slug: string }
         Returns: {
@@ -121,6 +191,7 @@ export type Database = {
           logo_url: string | null
           name: string
           slug: string
+          status: Database["public"]["Enums"]["org_status"]
           updated_at: string
         }
         SetofOptions: {
@@ -139,9 +210,11 @@ export type Database = {
         Returns: boolean
       }
       is_org_member: { Args: { _org: string; _user: string }; Returns: boolean }
+      leave_organization: { Args: { _org: string }; Returns: undefined }
     }
     Enums: {
       org_role: "owner" | "admin" | "member"
+      org_status: "active" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -270,6 +343,7 @@ export const Constants = {
   public: {
     Enums: {
       org_role: ["owner", "admin", "member"],
+      org_status: ["active", "suspended"],
     },
   },
 } as const
