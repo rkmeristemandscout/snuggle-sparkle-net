@@ -43,7 +43,7 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
               const s = event.data.object as Stripe.Checkout.Session;
               const orgId = s.metadata?.organization_id ?? (await orgIdFromCustomer(s.customer as string));
               if (orgId && s.subscription) {
-                const sub = await stripe.subscriptions.retrieve(s.subscription as string);
+                const sub = await stripe.subscriptions.retrieve(s.subscription as string) as unknown as Stripe.Subscription & { current_period_start: number; current_period_end: number };
                 const planId = await planIdFromPrice(sub.items.data[0]?.price.id);
                 await supabaseAdmin.from("subscriptions").upsert({
                   organization_id: orgId,
@@ -51,8 +51,8 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
                   stripe_customer_id: sub.customer as string,
                   stripe_subscription_id: sub.id,
                   status: sub.status,
-                  current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-                  current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+                  current_period_start: sub.current_period_start ? new Date(sub.current_period_start * 1000).toISOString() : null,
+                  current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
                   cancel_at_period_end: sub.cancel_at_period_end,
                   canceled_at: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
                   trial_end: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
@@ -63,7 +63,7 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
             case "customer.subscription.created":
             case "customer.subscription.updated":
             case "customer.subscription.deleted": {
-              const sub = event.data.object as Stripe.Subscription;
+              const sub = event.data.object as Stripe.Subscription & { current_period_start?: number; current_period_end?: number };
               const orgId = sub.metadata?.organization_id ?? (await orgIdFromCustomer(sub.customer as string));
               if (orgId) {
                 const planId = await planIdFromPrice(sub.items.data[0]?.price.id);
@@ -109,18 +109,22 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
             }
             case "payment_intent.succeeded":
             case "payment_intent.payment_failed": {
-              const pi = event.data.object as Stripe.PaymentIntent;
+              const pi = event.data.object as Stripe.PaymentIntent & { invoice?: string | null };
               const orgId = await orgIdFromCustomer(pi.customer as string);
               if (orgId) {
+                const latestCharge = pi.latest_charge
+                  ? await stripe.charges.retrieve(pi.latest_charge as string).catch(() => null)
+                  : null;
                 await supabaseAdmin.from("payments").upsert({
                   organization_id: orgId,
                   stripe_payment_intent_id: pi.id,
+                  stripe_charge_id: latestCharge?.id ?? null,
                   stripe_invoice_id: (pi.invoice as string) ?? null,
                   amount_cents: pi.amount,
                   currency: pi.currency,
                   status: pi.status,
                   description: pi.description,
-                  receipt_url: pi.charges?.data[0]?.receipt_url ?? null,
+                  receipt_url: latestCharge?.receipt_url ?? null,
                   paid_at: pi.status === "succeeded" ? new Date().toISOString() : null,
                 }, { onConflict: "stripe_payment_intent_id" });
               }
