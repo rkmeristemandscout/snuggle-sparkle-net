@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+          organization_id: string
+          summary: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          summary: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           created_at: string
@@ -48,6 +92,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "departments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string | null
+          metadata: Json
+          organization_id: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string | null
+          metadata?: Json
+          organization_id?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string | null
+          metadata?: Json
+          organization_id?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -497,6 +588,18 @@ export type Database = {
         Returns: boolean
       }
       leave_organization: { Args: { _org: string }; Returns: undefined }
+      notify_org_members: {
+        Args: {
+          _except: string
+          _link: string
+          _message: string
+          _metadata: Json
+          _org: string
+          _title: string
+          _type: string
+        }
+        Returns: undefined
+      }
       reject_invitation: { Args: { _token: string }; Returns: undefined }
       resend_invitation: {
         Args: { _invitation_id: string }
