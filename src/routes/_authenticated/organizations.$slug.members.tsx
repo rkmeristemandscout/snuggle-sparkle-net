@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { inviteSchema, type InviteValues } from "@/lib/auth-schemas";
 import { useCurrentOrg, type OrgRole } from "@/hooks/use-current-org";
 import { useSession } from "@/hooks/use-session";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,9 +29,10 @@ function MembersPage() {
   const { slug } = useParams({ from: "/_authenticated/organizations/$slug/members" });
   const { user } = useSession();
   const { memberships } = useCurrentOrg();
+  const { can } = usePermissions();
   const membership = memberships.find((m) => m.organization.slug === slug);
   const org = membership?.organization;
-  const canManage = membership?.role === "owner" || membership?.role === "admin";
+  const canManage = can(["org.manage_users", "org.invite_members"]);
   const isOwner = membership?.role === "owner";
   const qc = useQueryClient();
 
