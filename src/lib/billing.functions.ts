@@ -51,7 +51,7 @@ async function getOrCreateCustomer(
 /** Create a Stripe Checkout session to upgrade/subscribe to a plan. */
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       organizationId: z.string().uuid(),
       planId: z.string().uuid(),
@@ -122,7 +122,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 /** Create a Stripe Customer Portal session (manage payment method, invoices, cancel, etc.) */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       organizationId: z.string().uuid(),
       returnUrl: z.string().url(),
@@ -151,7 +151,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
 /** Cancel subscription at period end (or immediately). */
 export const cancelSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       organizationId: z.string().uuid(),
       immediately: z.boolean().default(false),
@@ -181,7 +181,7 @@ export const cancelSubscription = createServerFn({ method: "POST" })
 /** Renew (undo pending cancellation) a subscription. */
 export const renewSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ organizationId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -204,7 +204,7 @@ export const renewSubscription = createServerFn({ method: "POST" })
 /** Change plan (upgrade/downgrade) mid-cycle with proration. */
 export const changePlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       organizationId: z.string().uuid(),
       planId: z.string().uuid(),
@@ -257,7 +257,7 @@ export const changePlan = createServerFn({ method: "POST" })
 /** Super-admin only: set Stripe Product / Price IDs on a plan. */
 export const updatePlanStripeIds = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       planId: z.string().uuid(),
       stripeProductId: z.string().trim().nullable().optional(),

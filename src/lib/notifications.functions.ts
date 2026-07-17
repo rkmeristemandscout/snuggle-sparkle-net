@@ -15,7 +15,7 @@ const markAllSchema = z.object({ organizationId: z.string().uuid().optional() })
 
 export const listNotifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => listSchema.parse(v ?? {}))
+  .validator((v: unknown) => listSchema.parse(v ?? {}))
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("notifications")
@@ -32,7 +32,7 @@ export const listNotifications = createServerFn({ method: "GET" })
 
 export const markNotificationRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => idSchema.parse(v))
+  .validator((v: unknown) => idSchema.parse(v))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("mark_notification_read", { _id: data.id });
     if (error) throw new Error(error.message);
@@ -41,7 +41,7 @@ export const markNotificationRead = createServerFn({ method: "POST" })
 
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => markAllSchema.parse(v ?? {}))
+  .validator((v: unknown) => markAllSchema.parse(v ?? {}))
   .handler(async ({ data, context }) => {
     const { data: count, error } = await context.supabase.rpc("mark_all_notifications_read", {
       _org: data.organizationId ?? undefined,
@@ -52,7 +52,7 @@ export const markAllNotificationsRead = createServerFn({ method: "POST" })
 
 export const deleteNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => idSchema.parse(v))
+  .validator((v: unknown) => idSchema.parse(v))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("delete_notification", { _id: data.id });
     if (error) throw new Error(error.message);

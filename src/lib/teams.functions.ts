@@ -12,7 +12,7 @@ function fail(msg: string): never {
 
 export const listTeams = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { organizationId: string }) =>
+  .validator((d: { organizationId: string }) =>
     z.object({ organizationId: uuid }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -27,7 +27,7 @@ export const listTeams = createServerFn({ method: "GET" })
 
 export const createTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { organizationId: string } & z.infer<typeof teamSchema>) =>
+  .validator((d: { organizationId: string } & z.infer<typeof teamSchema>) =>
     z.object({ organizationId: uuid }).merge(teamSchema).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -49,7 +49,7 @@ export const createTeam = createServerFn({ method: "POST" })
 
 export const updateTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { teamId: string } & Partial<z.infer<typeof teamSchema>> & { ownerId?: string }) =>
+  .validator((d: { teamId: string } & Partial<z.infer<typeof teamSchema>> & { ownerId?: string }) =>
     z.object({
       teamId: uuid,
       name: z.string().trim().min(2).max(60).optional(),
@@ -76,7 +76,7 @@ export const updateTeam = createServerFn({ method: "POST" })
 
 export const deleteTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { teamId: string }) => z.object({ teamId: uuid }).parse(d))
+  .validator((d: { teamId: string }) => z.object({ teamId: uuid }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("teams").delete().eq("id", data.teamId);
     if (error) fail(error.message);
@@ -85,7 +85,7 @@ export const deleteTeam = createServerFn({ method: "POST" })
 
 export const addTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { teamId: string; userId: string; role?: "owner" | "member" }) =>
+  .validator((d: { teamId: string; userId: string; role?: "owner" | "member" }) =>
     z.object({
       teamId: uuid, userId: uuid,
       role: z.enum(["owner", "member"]).default("member"),
@@ -101,7 +101,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
 
 export const removeTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { teamId: string; userId: string }) =>
+  .validator((d: { teamId: string; userId: string }) =>
     z.object({ teamId: uuid, userId: uuid }).parse(d),
   )
   .handler(async ({ data, context }) => {

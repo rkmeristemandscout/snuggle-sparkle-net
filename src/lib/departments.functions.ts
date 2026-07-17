@@ -8,7 +8,7 @@ function fail(msg: string): never { throw new Error(msg); }
 
 export const listDepartments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { organizationId: string }) =>
+  .validator((d: { organizationId: string }) =>
     z.object({ organizationId: uuid }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -23,7 +23,7 @@ export const listDepartments = createServerFn({ method: "GET" })
 
 export const createDepartment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { organizationId: string } & z.infer<typeof departmentSchema>) =>
+  .validator((d: { organizationId: string } & z.infer<typeof departmentSchema>) =>
     z.object({ organizationId: uuid }).merge(departmentSchema).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -42,7 +42,7 @@ export const createDepartment = createServerFn({ method: "POST" })
 
 export const updateDepartment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { departmentId: string } & Partial<z.infer<typeof departmentSchema>>) =>
+  .validator((d: { departmentId: string } & Partial<z.infer<typeof departmentSchema>>) =>
     z.object({
       departmentId: uuid,
       name: z.string().trim().min(2).max(60).optional(),
@@ -64,7 +64,7 @@ export const updateDepartment = createServerFn({ method: "POST" })
 
 export const deleteDepartment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { departmentId: string }) => z.object({ departmentId: uuid }).parse(d))
+  .validator((d: { departmentId: string }) => z.object({ departmentId: uuid }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("departments").delete().eq("id", data.departmentId);
