@@ -129,6 +129,7 @@ export type Database = {
           ip: string | null
           metadata: Json
           organization_id: string | null
+          request_id: string | null
           summary: string
           user_agent: string | null
         }
@@ -143,6 +144,7 @@ export type Database = {
           ip?: string | null
           metadata?: Json
           organization_id?: string | null
+          request_id?: string | null
           summary: string
           user_agent?: string | null
         }
@@ -157,6 +159,7 @@ export type Database = {
           ip?: string | null
           metadata?: Json
           organization_id?: string | null
+          request_id?: string | null
           summary?: string
           user_agent?: string | null
         }
@@ -210,6 +213,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      error_logs: {
+        Row: {
+          created_at: string
+          id: string
+          level: string
+          message: string
+          metadata: Json
+          method: string | null
+          organization_id: string | null
+          path: string | null
+          request_id: string | null
+          source: string
+          stack: string | null
+          status: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level?: string
+          message: string
+          metadata?: Json
+          method?: string | null
+          organization_id?: string | null
+          path?: string | null
+          request_id?: string | null
+          source: string
+          stack?: string | null
+          status?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: string
+          message?: string
+          metadata?: Json
+          method?: string | null
+          organization_id?: string | null
+          path?: string | null
+          request_id?: string | null
+          source?: string
+          stack?: string | null
+          status?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       feature_flags: {
         Row: {
@@ -1001,6 +1052,10 @@ export type Database = {
         Args: { _team: string; _user: string }
         Returns: boolean
       }
+      cleanup_expired_invitations: { Args: never; Returns: number }
+      cleanup_old_audit_logs: { Args: { _days?: number }; Returns: number }
+      cleanup_old_error_logs: { Args: { _days?: number }; Returns: number }
+      cleanup_old_notifications: { Args: { _days?: number }; Returns: number }
       create_api_key: {
         Args: {
           _expires_at?: string
@@ -1035,6 +1090,7 @@ export type Database = {
         }
       }
       current_user_email: { Args: never; Returns: string }
+      delete_notification: { Args: { _id: string }; Returns: undefined }
       expire_invitation: {
         Args: { _invitation_id: string }
         Returns: undefined
@@ -1076,6 +1132,8 @@ export type Database = {
         Args: { _action: string; _org?: string }
         Returns: undefined
       }
+      mark_all_notifications_read: { Args: { _org?: string }; Returns: number }
+      mark_notification_read: { Args: { _id: string }; Returns: undefined }
       notify_org_members: {
         Args: {
           _except: string
@@ -1120,6 +1178,7 @@ export type Database = {
         }
       }
       revoke_api_key: { Args: { _id: string }; Returns: undefined }
+      run_background_jobs: { Args: never; Returns: Json }
       shares_org_with: { Args: { _other: string }; Returns: boolean }
       team_org: { Args: { _team: string }; Returns: string }
       write_audit_log: {
