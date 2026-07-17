@@ -29,7 +29,7 @@ export async function logServerError(input: LogErrorInput): Promise<void> {
       path: input.path ?? null,
       method: input.method ?? null,
       status: input.status ?? null,
-      metadata: input.metadata ?? {},
+      metadata: (input.metadata ?? {}) as never,
     });
   } catch (e) {
     console.error("[error_logs] failed to persist error", e);

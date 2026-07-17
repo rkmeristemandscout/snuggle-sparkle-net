@@ -32,6 +32,7 @@ import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenti
 import { Route as AuthenticatedOrganizationsSlugRouteImport } from './routes/_authenticated/organizations.$slug'
 import { Route as AuthenticatedBillingPlansRouteImport } from './routes/_authenticated/billing.plans'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe.webhook'
+import { Route as ApiPublicJobsCleanupRouteImport } from './routes/api/public/jobs.cleanup'
 import { Route as AuthenticatedOrganizationsSlugSettingsRouteImport } from './routes/_authenticated/organizations.$slug.settings'
 import { Route as AuthenticatedOrganizationsSlugMembersRouteImport } from './routes/_authenticated/organizations.$slug.members'
 
@@ -156,6 +157,11 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsCleanupRoute = ApiPublicJobsCleanupRouteImport.update({
+  id: '/api/public/jobs/cleanup',
+  path: '/api/public/jobs/cleanup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOrganizationsSlugSettingsRoute =
   AuthenticatedOrganizationsSlugSettingsRouteImport.update({
     id: '/settings',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/organizations/$slug/members': typeof AuthenticatedOrganizationsSlugMembersRoute
   '/organizations/$slug/settings': typeof AuthenticatedOrganizationsSlugSettingsRoute
+  '/api/public/jobs/cleanup': typeof ApiPublicJobsCleanupRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/organizations/$slug/members': typeof AuthenticatedOrganizationsSlugMembersRoute
   '/organizations/$slug/settings': typeof AuthenticatedOrganizationsSlugSettingsRoute
+  '/api/public/jobs/cleanup': typeof ApiPublicJobsCleanupRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/_authenticated/organizations/$slug/members': typeof AuthenticatedOrganizationsSlugMembersRoute
   '/_authenticated/organizations/$slug/settings': typeof AuthenticatedOrganizationsSlugSettingsRoute
+  '/api/public/jobs/cleanup': typeof ApiPublicJobsCleanupRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/organizations/$slug/members'
     | '/organizations/$slug/settings'
+    | '/api/public/jobs/cleanup'
     | '/api/public/stripe/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/organizations/$slug/members'
     | '/organizations/$slug/settings'
+    | '/api/public/jobs/cleanup'
     | '/api/public/stripe/webhook'
   id:
     | '__root__'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/organizations/$slug/members'
     | '/_authenticated/organizations/$slug/settings'
+    | '/api/public/jobs/cleanup'
     | '/api/public/stripe/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -336,6 +348,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   JoinTokenRoute: typeof JoinTokenRoute
+  ApiPublicJobsCleanupRoute: typeof ApiPublicJobsCleanupRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
@@ -502,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/cleanup': {
+      id: '/api/public/jobs/cleanup'
+      path: '/api/public/jobs/cleanup'
+      fullPath: '/api/public/jobs/cleanup'
+      preLoaderRoute: typeof ApiPublicJobsCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/organizations/$slug/settings': {
       id: '/_authenticated/organizations/$slug/settings'
       path: '/settings'
@@ -626,6 +646,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   JoinTokenRoute: JoinTokenRoute,
+  ApiPublicJobsCleanupRoute: ApiPublicJobsCleanupRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport

@@ -44,7 +44,7 @@ export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .inputValidator((v: unknown) => markAllSchema.parse(v ?? {}))
   .handler(async ({ data, context }) => {
     const { data: count, error } = await context.supabase.rpc("mark_all_notifications_read", {
-      _org: data.organizationId ?? null,
+      _org: data.organizationId ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { count: (count as number) ?? 0 };
