@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { departmentSchema, type DepartmentValues } from "@/lib/auth-schemas";
+import { createDepartment, updateDepartment, deleteDepartment } from "@/lib/departments.functions";
 import { useCurrentOrg } from "@/hooks/use-current-org";
 import { useSession } from "@/hooks/use-session";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -25,13 +27,16 @@ export const Route = createFileRoute("/_authenticated/departments")({
 });
 
 function DepartmentsPage() {
-  const { user } = useSession();
+  useSession();
   const { currentMembership } = useCurrentOrg();
   const { can } = usePermissions();
   const org = currentMembership?.organization;
   const canManage = can(["department.create", "department.update", "department.delete"]);
   const qc = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const createFn = useServerFn(createDepartment);
+  const delFn = useServerFn(deleteDepartment);
+
 
   const departments = useQuery({
     enabled: !!org,
@@ -54,14 +59,8 @@ function DepartmentsPage() {
 
   const create = useMutation({
     mutationFn: async (v: DepartmentValues) => {
-      if (!org || !user) throw new Error("Missing context");
-      const { error } = await supabase.from("departments").insert({
-        organization_id: org.id,
-        name: v.name, slug: v.slug,
-        description: v.description || null,
-        created_by: user.id,
-      });
-      if (error) throw error;
+      if (!org) throw new Error("Missing organization");
+      return createFn({ data: { organizationId: org.id, ...v } });
     },
     onSuccess: () => {
       toast.success("Department created");
@@ -72,10 +71,7 @@ function DepartmentsPage() {
   });
 
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("departments").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: async (departmentId: string) => delFn({ data: { departmentId } }),
     onSuccess: () => {
       toast.success("Department deleted");
       qc.invalidateQueries({ queryKey: ["departments", org?.id] });
@@ -197,13 +193,9 @@ function EditRow({
     resolver: zodResolver(departmentSchema),
     defaultValues: { name: dept.name, slug: dept.slug, description: dept.description ?? "" },
   });
+  const updFn = useServerFn(updateDepartment);
   const update = useMutation({
-    mutationFn: async (v: DepartmentValues) => {
-      const { error } = await supabase.from("departments").update({
-        name: v.name, slug: v.slug, description: v.description || null,
-      }).eq("id", dept.id);
-      if (error) throw error;
-    },
+    mutationFn: async (v: DepartmentValues) => updFn({ data: { departmentId: dept.id, ...v } }),
     onSuccess: () => { toast.success("Department updated"); onDone(); },
     onError: (e: Error) => toast.error(e.message),
   });
