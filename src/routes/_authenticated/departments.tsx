@@ -59,14 +59,8 @@ function DepartmentsPage() {
 
   const create = useMutation({
     mutationFn: async (v: DepartmentValues) => {
-      if (!org || !user) throw new Error("Missing context");
-      const { error } = await supabase.from("departments").insert({
-        organization_id: org.id,
-        name: v.name, slug: v.slug,
-        description: v.description || null,
-        created_by: user.id,
-      });
-      if (error) throw error;
+      if (!org) throw new Error("Missing organization");
+      return createFn({ data: { organizationId: org.id, ...v } });
     },
     onSuccess: () => {
       toast.success("Department created");
@@ -77,10 +71,7 @@ function DepartmentsPage() {
   });
 
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("departments").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: async (departmentId: string) => delFn({ data: { departmentId } }),
     onSuccess: () => {
       toast.success("Department deleted");
       qc.invalidateQueries({ queryKey: ["departments", org?.id] });
