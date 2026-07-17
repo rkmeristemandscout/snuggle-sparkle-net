@@ -166,9 +166,9 @@ function RolesPage() {
             <li key={r.id} className="rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">
+                  <div className="font-medium">
                     {r.name} <Badge variant="outline" className="ml-2">{r.scope}</Badge>
-                  </p>
+                  </div>
                   <p className="text-xs text-muted-foreground">{r.description}</p>
                 </div>
                 <Badge variant="secondary">rank {r.rank}</Badge>
